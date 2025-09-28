@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeWebsite();
     setupEventListeners();
     startOpeningSequence();
+    
+    // Auto-start music after 5 seconds
+    setTimeout(() => {
+        autoStartMusic();
+    }, 5000);
 });
 
 // Initialize website components
@@ -201,6 +206,111 @@ function toggleMusic() {
     }
 }
 
+// Auto-start music function
+function autoStartMusic() {
+    if (!musicPlaying) {
+        const music = document.getElementById('backgroundMusic');
+        const musicBtn = document.getElementById('musicToggle');
+        
+        // Set volume to a comfortable level
+        music.volume = 0.6;
+        
+        // Try to play the music
+        music.play().then(() => {
+            // Success - music is playing
+            musicPlaying = true;
+            musicBtn.innerHTML = '<i class="fas fa-music"></i>';
+            console.log('Background music started automatically');
+        }).catch(e => {
+            // Auto-play was blocked by browser
+            console.log('Auto-play prevented by browser. User interaction required:', e);
+            // Show a subtle notification that music is available
+            showMusicNotification();
+        });
+    }
+}
+
+// Show music notification when auto-play is blocked
+function showMusicNotification() {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: rgba(255, 105, 180, 0.9);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: 500;
+        z-index: 1001;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 25px rgba(255, 105, 180, 0.3);
+        animation: slideInNotification 0.5s ease-out forwards;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    `;
+    notification.innerHTML = '🎵 Click to enable music';
+    
+    // Add notification animation
+    if (!document.querySelector('#notification-style')) {
+        const style = document.createElement('style');
+        style.id = 'notification-style';
+        style.textContent = `
+            @keyframes slideInNotification {
+                0% {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                100% {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutNotification {
+                0% {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Click to enable music
+    notification.addEventListener('click', () => {
+        toggleMusic();
+        notification.style.animation = 'slideOutNotification 0.3s ease-in forwards';
+        setTimeout(() => notification.remove(), 300);
+    });
+    
+    // Hover effect
+    notification.addEventListener('mouseenter', () => {
+        notification.style.transform = 'scale(1.05)';
+        notification.style.boxShadow = '0 12px 35px rgba(255, 105, 180, 0.5)';
+    });
+    
+    notification.addEventListener('mouseleave', () => {
+        notification.style.transform = 'scale(1)';
+        notification.style.boxShadow = '0 8px 25px rgba(255, 105, 180, 0.3)';
+    });
+    
+    document.body.appendChild(notification);
+    
+    // Auto-hide after 8 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideOutNotification 0.3s ease-in forwards';
+            setTimeout(() => notification.remove(), 300);
+        }
+    }, 8000);
+}
+
 // Confetti animation
 function createConfettiParticles() {
     const confettiContainer = document.querySelector('.confetti');
@@ -289,7 +399,7 @@ function nextSlide() {
 
 // Typewriter effect
 function startTypewriter() {
-    const text = "My dearest love, every moment with you feels like a beautiful dream come true. You bring so much joy, laughter, and warmth into my life. Your smile lights up my world, and your love gives me strength every single day. On this special day, I want you to know how incredibly grateful I am to have you by my side. You are not just my girlfriend, you are my best friend, my partner, and the love of my life. I promise to cherish every moment we share together and to love you more with each passing day. Happy Birthday, my beautiful angel! 💕";
+    const text = "Many many happy returns of the day, my sweetheart 😚💖\n\nYou are the reason my world feels complete, the one I live for, and the biggest blessing in my life. Every moment with you fills my heart with joy, laughter, and endless love.\n\nThank you for being my xun, my jaan, my sweetheart, my baby, my cutu 🥰—each name is still too small compared to what you truly mean to me.\n\nOn your special day, I wish you a life overflowing with happiness, prosperity, and success. May all your dreams come true, and may I always be by your side to celebrate every achievement and wipe away every tear.\n\nHappy Birthday, my love ❤🎂✨";
     
     const typewriterElement = document.getElementById('typewriterText');
     let i = 0;
